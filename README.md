@@ -1,4 +1,4 @@
-# Gallery Explorer
+# Minor Gallery Archive Toolbox
 
 ![](Img/1.png)
 
@@ -35,13 +35,3 @@ Please refer to the following steps.
 The archive tool converts all the words to english alphabet and then creates an index tree using trie.
 The index processing is incredibly fast because the trie struct is used in-memory.
 This works similar to Elasticsearch. 
-
-## Supports
-
-```
-DCInside
-Huv.kr - will be supports
-Clien - will be supports
-FM Korea - will be supports
-Inven - will be supports
-```
