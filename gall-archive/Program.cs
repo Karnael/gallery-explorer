@@ -1926,7 +1926,7 @@ namespace gall_archive
     {
         static void Main(string[] args)
         {
-            DCGalleryAnalyzer.Instance.Open("툴리우스갤 데이터.txt");
+            DCGalleryAnalyzer.Instance.Open("list-github-637267358677858889.txt");
 
             var invalid = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
             var sp = Path.Combine(Directory.GetCurrentDirectory(), "Archive",
@@ -1937,7 +1937,10 @@ namespace gall_archive
             Directory.CreateDirectory(sp);
             int i = 0;
 
-            for (; Convert.ToInt32(DCGalleryAnalyzer.Instance.Articles[i].no) > 400681; i++)
+            for (; Convert.ToInt32(DCGalleryAnalyzer.Instance.Articles[i].no) > 4193; i++)
+                ;
+
+            for (; Convert.ToInt32(DCGalleryAnalyzer.Instance.Articles[i].no) > 0; i++)
             {
                 var article = DCGalleryAnalyzer.Instance.Articles[i];
                 var ttitle = $"{article.title}";

@@ -294,7 +294,7 @@ namespace GalleryExplorer.Core
             switch (args[0])
             {
                 case "1":
-                    DCInsideArchive.Instance.Load(@"툴갤 아카이브.json");
+                    DCInsideArchive.Instance.Load(@"툴갤 아카이브-index.json");
                     break;
 
                 case "2":
@@ -318,7 +318,13 @@ namespace GalleryExplorer.Core
                     break;
 
                 case "5":
-                    DCInsideArchiveIndex.Instance.Build();
+                    {
+                        var stackSize = 100000000;
+                        Thread thread = new Thread(new ThreadStart(DCInsideArchiveIndex.Instance.Build), stackSize);
+                        thread.Start();
+                        thread.Join();
+                        //DCInsideArchiveIndex.Instance.Build();
+                    }
                     break;
 
                 case "6":
@@ -328,6 +334,23 @@ namespace GalleryExplorer.Core
                 case "7":
                     {
                         DCInsideArchiveIndexDatabase.Instance.Build();
+                    }
+                    break;
+
+                case "8":
+                    {
+                        var mm = new DCInsideGalleryModel();
+                        mm.articles = DCInsideArchive.Instance.Model.Select(x => x.info).ToList();
+                        mm.gallery_id = "tullius";
+                        mm.gallery_name = "툴리우스";
+                        mm.is_minor_gallery = true;
+
+                        var bbb = MessagePackSerializer.Serialize(mm);
+                        using (FileStream fsStream = new FileStream("툴리우스 갤러리 인덱싱 데이터.txt", FileMode.Create))
+                        using (BinaryWriter sw = new BinaryWriter(fsStream))
+                        {
+                            sw.Write(bbb);
+                        }
                     }
                     break;
             }

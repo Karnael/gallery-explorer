@@ -1,5 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Wpf.83.4.20\build\CefSharp.Wpf.props" Condition="Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Wpf.83.4.20\build\CefSharp.Wpf.props')" />
+  <Import Project="C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Common.83.4.20\build\CefSharp.Common.props" Condition="Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Common.83.4.20\build\CefSharp.Common.props')" />
+  <Import Project="C:\Users\rollrat\source\repos\download-queue\download-queue\packages\cef.redist.x86.83.4.2\build\cef.redist.x86.props" Condition="Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\cef.redist.x86.83.4.2\build\cef.redist.x86.props')" />
+  <Import Project="C:\Users\rollrat\source\repos\download-queue\download-queue\packages\cef.redist.x64.83.4.2\build\cef.redist.x64.props" Condition="Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\cef.redist.x64.83.4.2\build\cef.redist.x64.props')" />
   <Import Project="..\packages\Costura.Fody.4.1.0\build\Costura.Fody.props" Condition="Exists('..\packages\Costura.Fody.4.1.0\build\Costura.Fody.props')" />
   <Import Project="..\packages\OpenCvSharp4.runtime.win.4.3.0.20200421\build\net\OpenCvSharp4.runtime.win.props" Condition="Exists('..\packages\OpenCvSharp4.runtime.win.4.3.0.20200421\build\net\OpenCvSharp4.runtime.win.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -163,8 +167,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ArchiveViewer.xaml.cs">
+      <DependentUpon>ArchiveViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ArchiveWindow.xaml.cs">
       <DependentUpon>ArchiveWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CommentViewer.xaml.cs">
+      <DependentUpon>CommentViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ArrangePanel.cs" />
     <Compile Include="Controls\FallsPanel.cs" />
@@ -196,7 +206,15 @@
       <DependentUpon>ThumbnailItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="Version.cs" />
+    <Page Include="ArchiveViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ArchiveWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CommentViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -327,7 +345,15 @@
     <Error Condition="!Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.3\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.3\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets'))" />
     <Error Condition="!Exists('..\packages\Fody.6.0.0\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.6.0.0\build\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\Costura.Fody.4.1.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.4.1.0\build\Costura.Fody.props'))" />
+    <Error Condition="!Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\cef.redist.x64.83.4.2\build\cef.redist.x64.props')" Text="$([System.String]::Format('$(ErrorText)', 'C:\Users\rollrat\source\repos\download-queue\download-queue\packages\cef.redist.x64.83.4.2\build\cef.redist.x64.props'))" />
+    <Error Condition="!Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\cef.redist.x86.83.4.2\build\cef.redist.x86.props')" Text="$([System.String]::Format('$(ErrorText)', 'C:\Users\rollrat\source\repos\download-queue\download-queue\packages\cef.redist.x86.83.4.2\build\cef.redist.x86.props'))" />
+    <Error Condition="!Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Common.83.4.20\build\CefSharp.Common.props')" Text="$([System.String]::Format('$(ErrorText)', 'C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Common.83.4.20\build\CefSharp.Common.props'))" />
+    <Error Condition="!Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Common.83.4.20\build\CefSharp.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', 'C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Common.83.4.20\build\CefSharp.Common.targets'))" />
+    <Error Condition="!Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Wpf.83.4.20\build\CefSharp.Wpf.props')" Text="$([System.String]::Format('$(ErrorText)', 'C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Wpf.83.4.20\build\CefSharp.Wpf.props'))" />
+    <Error Condition="!Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Wpf.83.4.20\build\CefSharp.Wpf.targets')" Text="$([System.String]::Format('$(ErrorText)', 'C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Wpf.83.4.20\build\CefSharp.Wpf.targets'))" />
   </Target>
   <Import Project="..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.3\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets" Condition="Exists('..\packages\SQLitePCLRaw.lib.e_sqlite3.2.0.3\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" />
   <Import Project="..\packages\Fody.6.0.0\build\Fody.targets" Condition="Exists('..\packages\Fody.6.0.0\build\Fody.targets')" />
+  <Import Project="C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Common.83.4.20\build\CefSharp.Common.targets" Condition="Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Common.83.4.20\build\CefSharp.Common.targets')" />
+  <Import Project="C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Wpf.83.4.20\build\CefSharp.Wpf.targets" Condition="Exists('C:\Users\rollrat\source\repos\download-queue\download-queue\packages\CefSharp.Wpf.83.4.20\build\CefSharp.Wpf.targets')" />
 </Project>

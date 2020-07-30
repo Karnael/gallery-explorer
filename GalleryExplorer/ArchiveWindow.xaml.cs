@@ -148,7 +148,8 @@ namespace GalleryExplorer
                 //    Process.Start($"https://gall.dcinside.com/mgallery/board/view/?id={id}&no={no}");
                 //else
                 //    Process.Start($"https://gall.dcinside.com/board/view/?id={id}&no={no}");
-                Process.Start($"https://gall.dcinside.com/mgallery/board/view/?id=tullius&no={no}");
+                //Process.Start($"https://gall.dcinside.com/mgallery/board/view/?id=tullius&no={no}");
+                (new ArchiveViewer(no)).Show();
             }
         }
 

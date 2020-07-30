@@ -156,7 +156,14 @@ namespace gall_archive_zip
 
             for (int i = 0; i < Model.articles.Count; i++)
             {
-                Index.Add(Convert.ToInt32(Model.articles[i].no), i);
+                if (!Index.ContainsKey(Convert.ToInt32(Model.articles[i].no)))
+                {
+                    Index.Add(Convert.ToInt32(Model.articles[i].no), i);
+                }
+                else
+                {
+                    Console.WriteLine(Model.articles[i].no);
+                }
             }
         }
 
@@ -201,8 +208,8 @@ namespace gall_archive_zip
             DCGalleryAnalyzer.Instance.Open("툴리우스갤 데이터.txt");
             //DCGalleryAnalyzer.Instance.Open(@"F:\GalleryExplorer2\GalleryExplorer\bin\Debug\툴리우스갤 데이터.txt");
 
-            //var dir = @"C:\Users\rollrat\source\repos\tulius-archive\b\Archive\툴리우스 마이너 갤러리 (tullius)"; 
-            var dir = Path.Combine(Directory.GetCurrentDirectory(), "Archive", "툴리우스 마이너 갤러리 (tullius)");
+            var dir = @"F:\GalleryExplorer2\gall-archive-zip\bin\Release\netcoreapp3.1\Archive\툴리우스 마이너 갤러리 (tullius)"; 
+            //var dir = Path.Combine(Directory.GetCurrentDirectory(), "Archive", "Github 마이너 갤러리 (github)");
             var files = Directory.GetFiles(dir);
 
             //var ll = new List<DCInsideArticle>();
@@ -215,7 +222,15 @@ namespace gall_archive_zip
             {
                 var no = file.Split("[")[1].Split("]")[0];
                 if (!x.ContainsKey(no))
-                    x.Add(no, new NewDCArticle { info = DCGalleryAnalyzer.Instance.Model.articles[DCGalleryAnalyzer.Instance.Index[Convert.ToInt32(no)]] });
+                {
+                    if (DCGalleryAnalyzer.Instance.Index.ContainsKey(Convert.ToInt32(no)))
+                        x.Add(no, new NewDCArticle { info = DCGalleryAnalyzer.Instance.Model.articles[DCGalleryAnalyzer.Instance.Index[Convert.ToInt32(no)]] });
+                    else
+                    {
+                        Console.WriteLine(no);
+                        continue;
+                    }
+                }
                 if (file.Contains("]-body-"))
                 {
                     if (file.Contains("]-comments-"))

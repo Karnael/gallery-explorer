@@ -28,6 +28,36 @@ namespace GalleryExplorer.Core
         }
     }
 
+    public class DCInsideArchiveDB : ILazy<DCInsideArchiveDB>
+    {
+        public SQLiteWrapper<ArticleColumnModel> DB { get; private set; }
+
+        public void Load(string path)
+        {
+            DB = new SQLiteWrapper<ArticleColumnModel>(path);
+        }
+
+        public ArticleColumnModel QueryById(string id)
+        {
+            return DB.Query("no=" + id).First();
+        }
+    }
+
+    public class DCInsideArchiveCommentDB : ILazy<DCInsideArchiveCommentDB>
+    {
+        public SQLiteWrapper<CommentColumnModel> DB { get; private set; }
+
+        public void Load(string path)
+        {
+            DB = new SQLiteWrapper<CommentColumnModel>(path);
+        }
+
+        public List<CommentColumnModel> QueryById(string id)
+        {
+            return DB.Query("parent=" + id);
+        }
+    }
+
     public class DCInsideArchiveQuery
     {
         public List<DCInsideArchiveModel> Results { get; private set; }
@@ -1223,48 +1253,48 @@ namespace GalleryExplorer.Core
                 };
             }).ToList());
 
-            //var result = new List<DCInsideCommentElement>();
-            //DCInsideArchive.Instance.Model.ForEach(x =>
-            //{
-            //    if (x.comments == null) return;
-            //    foreach (var comm in x.comments)
-            //        result.Add(comm);
-            //});
-            //
-            //var db1 = new SQLiteWrapper<CommentColumnModel>("archive.db");
-            //
-            //db1.AddAll(result.Select(x =>
-            //{
-            //    return new CommentColumnModel
-            //    {
-            //        no = x.no.ToInt(),
-            //        parent = x.parent,
-            //        user_id = x.user_id,
-            //        name = x.name,
-            //        ip = x.ip,
-            //        reg_date = x.reg_date,
-            //        nicktype = x.nicktype,
-            //        t_ch1 = x.t_ch1,
-            //        t_ch2 = x.t_ch2,
-            //        vr_type = x.vr_type,
-            //        voice = x.voice,
-            //        rcnt = x.rcnt,
-            //        c_no = x.c_no,
-            //        depth = x.depth,
-            //        del_yn = x.del_yn,
-            //        is_delete = x.is_delete,
-            //        memo = x.memo,
-            //        my_cmt = x.my_cmt,
-            //        del_btn = x.del_btn,
-            //        mod_btn = x.mod_btn,
-            //        a_my_cmt = x.a_my_cmt,
-            //        reply_w = x.reply_w,
-            //        gallog_icon = x.gallog_icon,
-            //        vr_player = x.vr_player,
-            //        vr_player_tag = x.vr_player_tag,
-            //        next_type = x.next_type,
-            //    };
-            //}).ToList());
+            var result = new List<DCInsideCommentElement>();
+            DCInsideArchive.Instance.Model.ForEach(x =>
+            {
+                if (x.comments == null) return;
+                foreach (var comm in x.comments)
+                    result.Add(comm);
+            });
+
+            var db1 = new SQLiteWrapper<CommentColumnModel>("archive.db");
+
+            db1.AddAll(result.Select(x =>
+            {
+                return new CommentColumnModel
+                {
+                    no = x.no.ToInt(),
+                    parent = x.parent,
+                    user_id = x.user_id,
+                    name = x.name,
+                    ip = x.ip,
+                    reg_date = x.reg_date,
+                    nicktype = x.nicktype,
+                    t_ch1 = x.t_ch1,
+                    t_ch2 = x.t_ch2,
+                    vr_type = x.vr_type,
+                    voice = x.voice,
+                    rcnt = x.rcnt,
+                    c_no = x.c_no,
+                    depth = x.depth,
+                    del_yn = x.del_yn,
+                    is_delete = x.is_delete,
+                    memo = x.memo,
+                    my_cmt = x.my_cmt,
+                    del_btn = x.del_btn,
+                    mod_btn = x.mod_btn,
+                    a_my_cmt = x.a_my_cmt,
+                    reply_w = x.reply_w,
+                    gallog_icon = x.gallog_icon,
+                    vr_player = x.vr_player,
+                    vr_player_tag = x.vr_player_tag,
+                    next_type = x.next_type,
+                };
+            }).ToList());
         }
     }
 
@@ -1432,7 +1462,7 @@ namespace GalleryExplorer.Core
             var dd = disasm(word);
             TrieArticle trie = article_index.of(dd[0]);
             for (int i = 1; i < dd.Length; i++)
-                if (trie.Warp.ContainsKey(dd[i]))
+                if (trie.Warp != null && trie.Warp.ContainsKey(dd[i]))
                     trie = trie.Warp[dd[i]];
                 else
                     return new HashSet<int>();
@@ -1444,7 +1474,10 @@ namespace GalleryExplorer.Core
             var dd = disasm(word);
             TrieComment trie = comment_index.of(dd[0]);
             for (int i = 1; i < dd.Length; i++)
-                trie = trie.Warp[dd[i]];
+                if (trie.Warp != null && trie.Warp.ContainsKey(dd[i]))
+                    trie = trie.Warp[dd[i]];
+                else
+                    return new List<(int, int)>();
             return trie.Index;
         }
 #else

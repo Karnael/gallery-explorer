@@ -1,6 +1,8 @@
 ﻿// This source code is a part of Gallery Explorer Project.
 // Copyright (C) 2020. rollrat. Licensed under the MIT Licence.
 
+using CefSharp;
+using CefSharp.Wpf;
 using GalleryExplorer.Core;
 using GalleryExplorer.Domain;
 using MaterialDesignThemes.Wpf;
@@ -37,6 +39,7 @@ namespace GalleryExplorer
     {
         public static MainWindow Instance;
         DispatcherTimer timer = new DispatcherTimer();
+        bool star = false;
 
         public MainWindow()
         {
@@ -70,8 +73,12 @@ namespace GalleryExplorer
             {
                 Logger.Instance.PushError("unhandled: " + (e.ExceptionObject as Exception).ToString());
             };
-        }
 
+
+            CefSettings set = new CefSettings();
+            Cef.Initialize(set);
+        }
+        
         #region Search Box Action
 
         private void MainWindow_Closed(object sender, EventArgs e)
@@ -166,10 +173,11 @@ namespace GalleryExplorer
                 var no = (ResultList.SelectedItems[0] as GalleryDataGridItemViewModel).번호;
                 var id = DCGalleryAnalyzer.Instance.Model.gallery_id;
 
-                if (DCGalleryAnalyzer.Instance.Model.is_minor_gallery)
-                    Process.Start($"https://gall.dcinside.com/mgallery/board/view/?id={id}&no={no}");
-                else
-                    Process.Start($"https://gall.dcinside.com/board/view/?id={id}&no={no}");
+                //if (DCGalleryAnalyzer.Instance.Model.is_minor_gallery)
+                //    Process.Start($"https://gall.dcinside.com/mgallery/board/view/?id={id}&no={no}");
+                //else
+                //    Process.Start($"https://gall.dcinside.com/board/view/?id={id}&no={no}");
+                (new ArchiveViewer(no)).Show();
             }
         }
 
@@ -236,6 +244,12 @@ namespace GalleryExplorer
                     bool[] check = new bool[query.Title.Count];
                     IntersectCountSplit(article.title.Split(' '), query.Title, ref check);
                     if (!check.All((x => x)))
+                        continue;
+                }
+
+                if (star == true)
+                {
+                    if (!article.type.Contains("recom"))
                         continue;
                 }
 
@@ -420,7 +434,11 @@ namespace GalleryExplorer
                     return;
 
                 DCGalleryAnalyzer.Instance.Open(ofd.FileName);
-                SyncButton.IsEnabled = true;
+
+                var prefix = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(ofd.FileName), System.IO.Path.GetFileNameWithoutExtension(ofd.FileName));
+                DCInsideArchiveDB.Instance.Load(prefix + "-archive.db");
+                DCInsideArchiveCommentDB.Instance.Load(prefix + "-archive.db");
+                //SyncButton.IsEnabled = true;
                 SignalButton.IsEnabled = true;
                 Button_Click(null, null);
             }
@@ -482,19 +500,21 @@ namespace GalleryExplorer
         {
             if (FuzzingIcon.Tag is string && (string)FuzzingIcon.Tag == "checked")
             {
-                FuzzingIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.LightningBolt;
+                FuzzingIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.Star;
                 (FuzzingButton.FindResource("GlowOff") as Storyboard).Begin(FuzzingButton);
                 FuzzingIcon.Foreground = new SolidColorBrush(Colors.White);
                 FuzzingIcon.Tag = "unchecked";
                 logic.UsingFuzzySearch = false;
+                star = false;
             }
             else
             {
-                FuzzingIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.LightningBolt;
+                FuzzingIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.Star;
                 (FuzzingButton.FindResource("GlowOn") as Storyboard).Begin(FuzzingButton);
                 FuzzingIcon.Foreground = new SolidColorBrush(Colors.Yellow);
                 FuzzingIcon.Tag = "checked";
                 logic.UsingFuzzySearch = true;
+                star = true;
             }
         }
 
