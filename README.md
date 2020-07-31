@@ -1,7 +1,5 @@
 # Minor Gallery Archive Toolbox
 
-![](Img/1.png)
-
 Crawls the posts and Reconstructs them in a new form.
 
 ## Image Similarity Analyzer and Cluster
