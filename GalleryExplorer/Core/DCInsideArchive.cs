@@ -503,7 +503,7 @@ namespace GalleryExplorer.Core
         {
             {"contentcontainssimple",     DCInsideArchiveQueryTokenType.ContentContainsSimple},
             {"contentcontainshard",       DCInsideArchiveQueryTokenType.ContentContainsHard},
-#if DEBUG
+#if DEBUG || true
             {"contentauthornick",         DCInsideArchiveQueryTokenType.ContentAuthorNick},
             {"contentauthorip",           DCInsideArchiveQueryTokenType.ContentAuthorIp},
             {"contentauthorid",           DCInsideArchiveQueryTokenType.ContentAuthorId},
@@ -519,7 +519,7 @@ namespace GalleryExplorer.Core
             {"titlecontains",             DCInsideArchiveQueryTokenType.TitleContains},
             {"commentcontainssimple",     DCInsideArchiveQueryTokenType.CommentContainsSimple},
             {"commentcontainshard",       DCInsideArchiveQueryTokenType.CommentContainsHard},
-#if DEBUG
+#if DEBUG || true
             {"commentauthornick",         DCInsideArchiveQueryTokenType.CommentAuthorNick},
             {"commentauthorip",           DCInsideArchiveQueryTokenType.CommentAuthorIp},
             {"commentauthorid",           DCInsideArchiveQueryTokenType.CommentAuthorId},

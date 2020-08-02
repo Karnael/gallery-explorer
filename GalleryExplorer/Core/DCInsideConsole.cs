@@ -294,7 +294,8 @@ namespace GalleryExplorer.Core
             switch (args[0])
             {
                 case "1":
-                    DCInsideArchive.Instance.Load(@"툴갤 아카이브-index.json");
+                    //DCInsideArchive.Instance.Load(@"툴갤 아카이브-index.json");
+                    DCInsideArchive.Instance.Load(@"몬무스갤 아카이브-index.json");
                     break;
 
                 case "2":
@@ -341,8 +342,8 @@ namespace GalleryExplorer.Core
                     {
                         var mm = new DCInsideGalleryModel();
                         mm.articles = DCInsideArchive.Instance.Model.Select(x => x.info).ToList();
-                        mm.gallery_id = "tullius";
-                        mm.gallery_name = "툴리우스";
+                        mm.gallery_id = "monmusu";
+                        mm.gallery_name = "몬무스";
                         mm.is_minor_gallery = true;
 
                         var bbb = MessagePackSerializer.Serialize(mm);

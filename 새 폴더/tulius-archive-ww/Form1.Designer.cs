@@ -114,7 +114,7 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(142, 23);
             this.textBox4.TabIndex = 8;
-            this.textBox4.Text = "629501";
+            this.textBox4.Text = "104005";
             // 
             // label4
             // 
@@ -189,7 +189,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1";
-            this.Text = "샬롯갤 아카이브 툴 / 2020.08.03";
+            this.Text = "몬무스갤 아카이브 툴 / 2020.07.29";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);

@@ -139,7 +139,7 @@ namespace tullius_indexing_ww
                 return;
             }
 
-            var id = "monmusu";
+            var id = "charlotte";
 
             var starts = ps;
 
@@ -147,94 +147,98 @@ namespace tullius_indexing_ww
             bool real_cookie_receive = false;
 
             var articles = new List<DCInsidePageArticle>();
-
+            DCGalleryAnalyzer.Instance.Open();
             try
             {
-                for (; ps <= pe; ps++)
+                try
                 {
-                    string url;
-
-                    if (true)
-                        url = $"https://gall.dcinside.com/mgallery/board/lists/?id={id}&page={ps}";
-                    else
-                        url = $"https://gall.dcinside.com/board/lists/?id={id}&page={ps}";
-
-                    Logger.Instance.Push("Downloading String... = " + url);
-                    var task = NetTask.MakeDefault(url);
-                    task.Cookie = COOKIES;
-                    bool y = real_cookie_receive;
-                    if (real_cookie_receive == false)
+                    for (; ps <= pe; ps++)
                     {
-                        task.HeaderReceive = (ef) =>
+                        string url;
+
+                        if (true)
+                            url = $"https://gall.dcinside.com/mgallery/board/lists/?id={id}&page={ps}";
+                        else
+                            url = $"https://gall.dcinside.com/board/lists/?id={id}&page={ps}";
+
+                        Logger.Instance.Push("Downloading String... = " + url);
+                        var task = NetTask.MakeDefault(url);
+                        task.Cookie = COOKIES;
+                        bool y = real_cookie_receive;
+                        if (real_cookie_receive == false)
                         {
-                            append("헤더받음: " + ef);
-                            var xx = ef.Split('\n').First(x => x.Contains("Set-Cookie")).Replace("Set-Cookie: ", "").Trim();
-                            COOKIES = "PHPSESSID=" + SESS;
-                            COOKIES += "; PHPSESSKEY=" + xx.Split(new[] { "PHPSESSKEY=" }, StringSplitOptions.None)[1].Split(';')[0].Trim();
-                            COOKIES += $"; block_alert_{id}=1";
-                            real_cookie_receive = true;
-                            append("쿠키 변경됨: " + COOKIES);
-                        };
+                            task.HeaderReceive = (ef) =>
+                            {
+                                append("헤더받음: " + ef);
+                                var xx = ef.Split('\n').First(x => x.Contains("Set-Cookie")).Replace("Set-Cookie: ", "").Trim();
+                                COOKIES = "PHPSESSID=" + SESS;
+                                COOKIES += "; PHPSESSKEY=" + xx.Split(new[] { "PHPSESSKEY=" }, StringSplitOptions.None)[1].Split(';')[0].Trim();
+                                COOKIES += $"; block_alert_{id}=1";
+                                real_cookie_receive = true;
+                                append("쿠키 변경됨: " + COOKIES);
+                            };
+                        }
+                        var html = NetTools.DownloadString(task);
+                        if (y == false)
+                        {
+                            append("PS1");
+                            ps--;
+                            continue;
+                        }
+                        Logger.Instance.Push("Downloaded String = " + url);
+                        if (string.IsNullOrEmpty(html))
+                        {
+                            append("실패: " + url);
+                            Logger.Instance.Push("Fail: " + url);
+                            goto NEXT;
+                        }
+                        if (html.Length < 1000 && html.Contains("해당 마이너 갤러리는 운영원칙 위반으로 접근이 제한되었습니다."))
+                        {
+                            append("실패: 접근 거부, 접근 가능한 아이디로 재시도하시기 바랍니다.");
+                            break;
+                        }
+                        if (html.Contains("해당 마이너 갤러리는 운영원칙 위반(사유: 누드패치, 성행위 패치, 음란성 게시물 공지 등록 및 정리 안됨) 으로 접근이 제한되었습니다."))
+                        {
+                            //goto FUCK;
+                            return;
+                        }
+
+                        DCInsideGallery gall;
+
+                        if (true)
+                            gall = DCInsideUtils.ParseMinorGallery(html);
+                        else
+                            gall = DCInsideUtils.ParseGallery(html);
+
+                        if (true && (gall.articles == null || gall.articles.Length == 0))
+                            gall = DCInsideUtils.ParseGallery(html);
+
+                        if (gall.articles.Length == 0)
+                            break;
+
+                        articles.AddRange(gall.articles);
+
+                        Logger.Instance.Push("Parse: " + url);
+                        // 해당 마이너 갤러리는 운영원칙 위반으로 접근이 제한되었습니다.\n마이너 갤러리 메인으로 돌아갑니다.
+
+                        NEXT:
+                        var ss = TimeSpan.FromMilliseconds(720 * (pe - ps));
+                        var yy = "";
+                        if (ss.Days > 0)
+                            yy += ss.Days.ToString() + "일 ";
+                        if (ss.Days > 0 || ss.Hours > 0)
+                            yy += ss.Hours.ToString() + "시간 ";
+                        if (ss.Days > 0 || ss.Hours > 0 || ss.Minutes > 0)
+                            yy += ss.Minutes.ToString() + "분 ";
+                        if (ss.Days > 0 || ss.Hours > 0 || ss.Minutes > 0 || ss.Seconds > 0)
+                            yy += ss.Seconds.ToString() + "초 남음";
+
+                        status("진행중...[" + (ps - starts + 1).ToString() + "/" + (pe - starts + 1).ToString("#,#") + "] 남은시간: " + yy);
+                        Logger.Instance.Push("next: " + url + $" || {ps}/{pe}/{starts}");
+                        Thread.Sleep(700);
                     }
-                    var html = NetTools.DownloadString(task);
-                    if (y == false)
-                    {
-                        append("PS1");
-                        ps--;
-                        continue;
-                    }
-                    Logger.Instance.Push("Downloaded String = " + url);
-                    if (string.IsNullOrEmpty(html))
-                    {
-                        append("실패: " + url);
-                        Logger.Instance.Push("Fail: " + url);
-                        goto NEXT;
-                    }
-                    if (html.Length < 1000 && html.Contains("해당 마이너 갤러리는 운영원칙 위반으로 접근이 제한되었습니다."))
-                    {
-                        append("실패: 접근 거부, 접근 가능한 아이디로 재시도하시기 바랍니다.");
-                        break;
-                    }
-                    if (html.Contains("해당 마이너 갤러리는 운영원칙 위반(사유: 누드패치, 성행위 패치, 음란성 게시물 공지 등록 및 정리 안됨) 으로 접근이 제한되었습니다."))
-                    {
-                        //goto FUCK;
-                        return;
-                    }
-
-                    DCInsideGallery gall;
-
-                    if (true)
-                        gall = DCInsideUtils.ParseMinorGallery(html);
-                    else
-                        gall = DCInsideUtils.ParseGallery(html);
-
-                    if (true && (gall.articles == null || gall.articles.Length == 0))
-                        gall = DCInsideUtils.ParseGallery(html);
-
-                    if (gall.articles.Length == 0)
-                        break;
-
-                    articles.AddRange(gall.articles);
-
-                    Logger.Instance.Push("Parse: " + url);
-                    // 해당 마이너 갤러리는 운영원칙 위반으로 접근이 제한되었습니다.\n마이너 갤러리 메인으로 돌아갑니다.
-
-               NEXT:
-                    var ss = TimeSpan.FromMilliseconds(720 * (pe - ps));
-                    var yy = "";
-                    if (ss.Days > 0)
-                        yy += ss.Days.ToString() + "일 ";
-                    if (ss.Days > 0 || ss.Hours > 0)
-                        yy += ss.Hours.ToString() + "시간 ";
-                    if (ss.Days > 0 || ss.Hours > 0 || ss.Minutes > 0)
-                        yy += ss.Minutes.ToString() + "분 ";
-                    if (ss.Days > 0 || ss.Hours > 0 || ss.Minutes > 0 || ss.Seconds > 0)
-                        yy += ss.Seconds.ToString() + "초 남음";
-
-                    status("진행중...[" + (ps - starts + 1).ToString() + "/" + (pe - starts + 1).ToString("#,#") + "] 남은시간: " + yy);
-                    Logger.Instance.Push("next: " + url + $" || {ps}/{pe}/{starts}");
-                    Thread.Sleep(700);
                 }
+                catch { }
 
                 DCGalleryAnalyzer.Instance.Articles.AddRange(articles);
                 DCGalleryAnalyzer.Instance.Save();

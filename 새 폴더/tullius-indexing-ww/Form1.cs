@@ -11,8 +11,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using tulius_archive_ww;
 
-namespace tulius_archive_ww
+namespace tullius_indexing_ww
 {
     public partial class Form1 : Form
     {
@@ -44,7 +45,7 @@ namespace tulius_archive_ww
             Extends.Post(this, () => richTextBox1.AppendText(ww + "\r\n"));
         void status(string ww) => Extends.Post(this, () => label6.Text = ww);
 
-        private  void login()
+        private void login()
         {
             append("로그인 요청 시작 id=" + textBox1.Text + ", pwd=" + textBox2.Text);
             _driver = new ChromeDriver(_driverService, _options);
@@ -94,7 +95,7 @@ namespace tulius_archive_ww
             textBox1.Enabled = false;
             textBox2.Enabled = false;
 
-            await Task.Run(() =>login());
+            await Task.Run(() => login());
             if (SESS != "")
             {
                 button1.Enabled = false;
@@ -138,18 +139,14 @@ namespace tulius_archive_ww
                 return;
             }
 
-            var invalid = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
-            var sp = Path.Combine(Directory.GetCurrentDirectory(), "Archive",
-                $"샬롯 갤러리 (charlotte)");
-
-            var id = "charlotte";
-
-            Directory.CreateDirectory(sp);
+            var id = "monmusu";
 
             var starts = ps;
 
             status("진행중...[0/" + (pe - ps + 1).ToString("#,#") + "]");
             bool real_cookie_receive = false;
+
+            var articles = new List<DCInsidePageArticle>();
 
             try
             {
@@ -158,9 +155,9 @@ namespace tulius_archive_ww
                     string url;
 
                     if (true)
-                        url = $"https://gall.dcinside.com/mgallery/board/view/?id={id}&no={ps}";
+                        url = $"https://gall.dcinside.com/mgallery/board/lists/?id={id}&page={ps}";
                     else
-                        url = $"https://gall.dcinside.com/board/view/?id={id}&no={ps}";
+                        url = $"https://gall.dcinside.com/board/lists/?id={id}&page={ps}";
 
                     Logger.Instance.Push("Downloading String... = " + url);
                     var task = NetTask.MakeDefault(url);
@@ -174,7 +171,7 @@ namespace tulius_archive_ww
                             var xx = ef.Split('\n').First(x => x.Contains("Set-Cookie")).Replace("Set-Cookie: ", "").Trim();
                             COOKIES = "PHPSESSID=" + SESS;
                             COOKIES += "; PHPSESSKEY=" + xx.Split(new[] { "PHPSESSKEY=" }, StringSplitOptions.None)[1].Split(';')[0].Trim();
-                            COOKIES += "; block_alert_charlotte=1";
+                            COOKIES += $"; block_alert_{id}=1";
                             real_cookie_receive = true;
                             append("쿠키 변경됨: " + COOKIES);
                         };
@@ -203,31 +200,26 @@ namespace tulius_archive_ww
                         //goto FUCK;
                         return;
                     }
-                    var info = DCInsideUtils.ParseBoardView(html, true);
+
+                    DCInsideGallery gall;
+
+                    if (true)
+                        gall = DCInsideUtils.ParseMinorGallery(html);
+                    else
+                        gall = DCInsideUtils.ParseGallery(html);
+
+                    if (true && (gall.articles == null || gall.articles.Length == 0))
+                        gall = DCInsideUtils.ParseGallery(html);
+
+                    if (gall.articles.Length == 0)
+                        break;
+
+                    articles.AddRange(gall.articles);
+
                     Logger.Instance.Push("Parse: " + url);
                     // 해당 마이너 갤러리는 운영원칙 위반으로 접근이 제한되었습니다.\n마이너 갤러리 메인으로 돌아갑니다.
 
-                    var ttitle = $"{info.Title}";
-                    foreach (char c in invalid)
-                        ttitle = ttitle.Replace(c.ToString(), "");
-
-                    Logger.Instance.Push("ttile: " + ttitle);
-                    File.WriteAllText(Path.Combine(sp, $"[{ps}]-body-{ttitle}.json"), JsonConvert.SerializeObject(info, Formatting.Indented));
-                    Logger.Instance.Push("file-body: " + $"[{ps}]-body-{ttitle}.json");
-
-                    int com;
-                    if (int.TryParse(info.CommentCount.Replace(",", ""), out com) && com > 0)
-                    {
-                        try
-                        {
-                            var comments = DCInsideUtils.GetAllComments(id, ps.ToString()).Result;
-                            File.WriteAllText(Path.Combine(sp, $"[{ps}]-comments-{ttitle}.json"), JsonConvert.SerializeObject(comments, Formatting.Indented));
-                            Logger.Instance.Push("file-comment: " + $"[{ps}]-comments-{ttitle}.json");
-                        }
-                        catch { }
-                    }
-
-                NEXT:
+               NEXT:
                     var ss = TimeSpan.FromMilliseconds(720 * (pe - ps));
                     var yy = "";
                     if (ss.Days > 0)
@@ -244,8 +236,12 @@ namespace tulius_archive_ww
                     Thread.Sleep(700);
                 }
 
+                DCGalleryAnalyzer.Instance.Articles.AddRange(articles);
+                DCGalleryAnalyzer.Instance.Save();
+
                 status("완료");
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 append("실패: " + e.Message + "\r\n" + e.StackTrace);
             }
@@ -258,7 +254,7 @@ namespace tulius_archive_ww
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            //DCGalleryAnalyzer.Instance.Open("툴리우스갤 데이터.txt");
         }
     }
 

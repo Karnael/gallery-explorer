@@ -1,6 +1,8 @@
 ﻿// This source code is a part of Gallery Explorer Project.
 // Copyright (C) 2020. rollrat. Licensed under the MIT Licence.
 
+// TODO: 311623 BlogSpot
+
 using CefSharp;
 using CefSharp.Wpf;
 using GalleryExplorer.Core;
@@ -40,6 +42,7 @@ namespace GalleryExplorer
         public static MainWindow Instance;
         DispatcherTimer timer = new DispatcherTimer();
         bool star = false;
+        public static DownloadQueue.DownloadQueue Queue;
 
         public MainWindow()
         {
@@ -74,9 +77,10 @@ namespace GalleryExplorer
                 Logger.Instance.PushError("unhandled: " + (e.ExceptionObject as Exception).ToString());
             };
 
-
             CefSettings set = new CefSettings();
             Cef.Initialize(set);
+
+            Queue = new DownloadQueue.DownloadQueue();
         }
         
         #region Search Box Action
@@ -247,6 +251,12 @@ namespace GalleryExplorer
                         continue;
                 }
 
+                if (query.no != null && query.no != "")
+                {
+                    if (article.no != query.no)
+                        continue;
+                }
+
                 if (star == true)
                 {
                     if (!article.type.Contains("recom"))
@@ -293,6 +303,8 @@ namespace GalleryExplorer
                         query.Type = new List<string>() { elem.Substring("class:".Length) };
                     else
                         query.Type.Add(elem.Substring("class:".Length));
+                else if (elem.StartsWith("no:"))
+                    query.no = elem.Substring("no:".Length);
                 else
                 {
                     Core.Console.Instance.WriteErrorLine($"Unknown rule '{elem}'.");
@@ -327,6 +339,13 @@ namespace GalleryExplorer
                 tldx.Items.Clear();
                 foreach (var article in result)
                 {
+                    var icon = "ChatProcessingOutline";
+                    var color = "Gray";
+                    if (article.type.Contains("img") || article.type.Contains("pic"))
+                        icon = "Image";
+                    if (article.type.Contains("recom"))
+                        color = "Yellow";
+
                     tldx.Items.Add(new GalleryDataGridItemViewModel
                     {
                         번호 = article.no,
@@ -338,6 +357,8 @@ namespace GalleryExplorer
                         아이디 = article.uid != "" ? article.uid : $"({article.ip})",
                         조회수 = article.count ?? "",
                         추천수 = article.recommend ?? "",
+                        TypeIcon = icon,
+                        TypeColor = color
                     });
                 }
             }
@@ -439,7 +460,7 @@ namespace GalleryExplorer
                 DCInsideArchiveDB.Instance.Load(prefix + "-archive.db");
                 DCInsideArchiveCommentDB.Instance.Load(prefix + "-archive.db");
                 //SyncButton.IsEnabled = true;
-                SignalButton.IsEnabled = true;
+                //SignalButton.IsEnabled = true;
                 Button_Click(null, null);
             }
             else if (tag == "Sync")
@@ -733,5 +754,19 @@ namespace GalleryExplorer
         }
 
         #endregion
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+            {
+                var filename = "monmusu.txt";
+                DCGalleryAnalyzer.Instance.Open(filename);
+
+                var prefix = System.IO.Path.GetFileNameWithoutExtension(filename);
+                DCInsideArchiveDB.Instance.Load(prefix + "-archive.db");
+                DCInsideArchiveCommentDB.Instance.Load(prefix + "-archive.db");
+                Extends.Post(() => Button_Click(null, null));
+            });
+        }
     }
 }

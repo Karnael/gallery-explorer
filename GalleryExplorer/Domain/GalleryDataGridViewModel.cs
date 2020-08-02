@@ -33,6 +33,30 @@ namespace GalleryExplorer.Domain
             }
         }
 
+        private string _typeicon;
+        public string TypeIcon
+        {
+            get { return _typeicon; }
+            set
+            {
+                if (_typeicon == value) return;
+                _typeicon = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _typecolor;
+        public string TypeColor
+        {
+            get { return _typecolor; }
+            set
+            {
+                if (_typecolor == value) return;
+                _typecolor = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _class;
         public string 클래스
         {

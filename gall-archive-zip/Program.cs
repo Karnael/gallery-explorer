@@ -205,10 +205,10 @@ namespace gall_archive_zip
     {
         static void Main(string[] args)
         {
-            DCGalleryAnalyzer.Instance.Open("툴리우스갤 데이터.txt");
+            DCGalleryAnalyzer.Instance.Open("몬무스갤 데이터.txt");
             //DCGalleryAnalyzer.Instance.Open(@"F:\GalleryExplorer2\GalleryExplorer\bin\Debug\툴리우스갤 데이터.txt");
 
-            var dir = @"F:\GalleryExplorer2\gall-archive-zip\bin\Release\netcoreapp3.1\Archive\툴리우스 마이너 갤러리 (tullius)"; 
+            var dir = @"F:\GalleryExplorer2\gall-archive-zip\bin\Release\netcoreapp3.1\Archive\몬무스 갤러리 (monmusu)"; 
             //var dir = Path.Combine(Directory.GetCurrentDirectory(), "Archive", "Github 마이너 갤러리 (github)");
             var files = Directory.GetFiles(dir);
 
@@ -262,7 +262,7 @@ namespace gall_archive_zip
             //    serializer.Serialize(file, ll);
             //}
             var bbb = MessagePackSerializer.Serialize(ll);
-            using (FileStream fsStream = new FileStream("툴갤 아카이브-index.json", FileMode.Create))
+            using (FileStream fsStream = new FileStream("몬무스갤 아카이브-index.json", FileMode.Create))
             using (BinaryWriter sw = new BinaryWriter(fsStream))
             {
                 sw.Write(bbb);

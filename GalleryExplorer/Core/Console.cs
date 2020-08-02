@@ -113,11 +113,11 @@ namespace GalleryExplorer.Core
             System.Console.Out.WriteLine(@"                                        |___/                    |_|                                     ");
             System.Console.Out.WriteLine(@"");
 
-            System.Console.Title = "DCInside Gallery Explorer Console";
+            System.Console.Title = "DCInside Gallery Archive Explorer Console";
             System.Console.Out.WriteLine($"DCInside Gallery Explorer {Version.Text}");
             System.Console.Out.WriteLine("Copyright (C) 2020. DCInside Gallery Explorer Project");
-            System.Console.Out.WriteLine("E-Mail: rollrat.cse@gmail.com");
-            System.Console.Out.WriteLine("Source-code: https://github.com/rollrat/gallery-explorer");
+            System.Console.Out.WriteLine("E-Mail: violet.dev.master@gmail.com");
+            System.Console.Out.WriteLine("Source-code: https://github.com/violet-dev/gallery-explorer");
             System.Console.Out.WriteLine("");
         }
 

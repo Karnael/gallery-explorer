@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:GalleryExplorer"
         mc:Ignorable="d" AllowsTransparency="False"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:controls1="clr-namespace:GalleryExplorer.Controls"
+        xmlns:controls1="clr-namespace:GalleryExplorer.Controls" xmlns:materialDesign1="http://schemas.microsoft.com/netfx/2009/xaml/presentation"
         LocationChanged="Window_LocationChanged"
         SizeChanged="Window_SizeChanged" WindowStartupLocation="CenterScreen"
-        Title="디시인사이드 아카이브 갤러리 탐색기" Height="781.834" Width="1161.667">
+        Title="디시인사이드 아카이브 갤러리 탐색기" Height="781.834" Width="1186.667" Loaded="Window_Loaded">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -127,7 +127,7 @@
                     </Button>
                 </Grid>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                <!--<StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" IsEnabled="False">
                     <ToggleButton Checked="ToggleButton_Checked" Unchecked="ToggleButton_Unchecked">
                         <ToggleButton.Resources>
                             <ResourceDictionary>
@@ -148,7 +148,7 @@
                             </ResourceDictionary>
                         </TextBlock.Resources>
                     </TextBlock>
-                </StackPanel>
+                </StackPanel>-->
             </Grid>
 
             <Grid Grid.Row="1" Grid.Column="0" Background="#1C1C1C">
@@ -224,7 +224,7 @@
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem PreviewMouseUp="StackPanel_MouseDown" Tag="Console" IsEnabled="False">
+                    <ListBoxItem PreviewMouseUp="StackPanel_MouseDown" Tag="Console" IsEnabled="True">
                         <ListBoxItem.ToolTip>
                             <ToolTip Content="콘솔" Placement="RelativePoint" PlacementRectangle="45,3,0,0" HasDropShadow="True"/>
                         </ListBoxItem.ToolTip>
@@ -316,6 +316,13 @@
                     <DataGrid.Columns>
                         <materialDesign:DataGridTextColumn  Binding="{Binding 번호}" Width="59" Header="번호" SortDirection="Descending" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
+                        <DataGridTemplateColumn Width="25" Header="">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <materialDesign:PackIcon Kind="{Binding TypeIcon}" Foreground="{Binding TypeColor}" Margin="0 4 0 0"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                         <materialDesign:DataGridTextColumn  Binding="{Binding 클래스}" Width="122" Header="클래스" ElementStyle="{StaticResource TextBlockStyleKey}"
                                                            EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}"/>
                         <materialDesign:DataGridTextColumn  Binding="{Binding 제목}" Width="322" Header="제목" ElementStyle="{StaticResource TextBlockStyleKey}"

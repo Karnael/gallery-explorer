@@ -140,9 +140,9 @@ namespace tulius_archive_ww
 
             var invalid = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
             var sp = Path.Combine(Directory.GetCurrentDirectory(), "Archive",
-                $"샬롯 갤러리 (charlotte)");
+                $"몬무스 갤러리 (monmusu)");
 
-            var id = "charlotte";
+            var id = "monmusu";
 
             Directory.CreateDirectory(sp);
 
@@ -174,7 +174,7 @@ namespace tulius_archive_ww
                             var xx = ef.Split('\n').First(x => x.Contains("Set-Cookie")).Replace("Set-Cookie: ", "").Trim();
                             COOKIES = "PHPSESSID=" + SESS;
                             COOKIES += "; PHPSESSKEY=" + xx.Split(new[] { "PHPSESSKEY=" }, StringSplitOptions.None)[1].Split(';')[0].Trim();
-                            COOKIES += "; block_alert_charlotte=1";
+                            COOKIES += "; block_alert_monmusu=1";
                             real_cookie_receive = true;
                             append("쿠키 변경됨: " + COOKIES);
                         };

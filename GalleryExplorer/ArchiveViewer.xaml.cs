@@ -3,6 +3,8 @@ using CefSharp.Wpf;
 using GalleryExplorer.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -24,9 +26,11 @@ namespace GalleryExplorer
     public partial class ArchiveViewer : Window
     {
         ChromiumWebBrowser browser;
-        string html;
+        ArticleColumnModel article;
         List<CommentColumnModel> comments;
         CommentViewer comment_viewer;
+
+        const string gallname = "monmusu";
 
         public ArchiveViewer(string id)
         {
@@ -37,7 +41,8 @@ namespace GalleryExplorer
                 RequestHandler = new MyRequestHandler(),
             };
             browserContainer.Content = browser;
-            html = DCInsideArchiveDB.Instance.QueryById(id).raw;
+            article = DCInsideArchiveDB.Instance.QueryById(id);
+            Title.Text = article.title;
             comments = DCInsideArchiveCommentDB.Instance.QueryById(id);
 
             if (comments != null && comments.Count != 0)
@@ -47,6 +52,21 @@ namespace GalleryExplorer
             }
 
             this.PreviewKeyDown += new KeyEventHandler(HandleEsc);
+
+            browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
+        }
+
+        private void Browser_IsBrowserInitializedChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            try
+            {
+                const string resourcename = "http://mypage.html";
+                //html = html.Replace("dcimg2.dcinside", "dcimg6.dcinside");
+                System.IO.MemoryStream memorystream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(article.raw));
+                browser.RegisterResourceHandler(resourcename, memorystream);
+                browser.LoadHtml(article.raw, resourcename);
+                browser.UnRegisterResourceHandler(resourcename);
+            } catch { }
         }
 
         private void HandleEsc(object sender, KeyEventArgs e)
@@ -74,22 +94,60 @@ namespace GalleryExplorer
                 }
                 return null;
             }
+
+            protected override bool OnBeforeBrowse(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, IRequest request, bool userGesture, bool isRedirect)
+            { 
+                if (request.Url.StartsWith($"https://gall.dcinside.com/mgallery/board/view?id={gallname}&no=") ||
+                    request.Url.StartsWith($"https://gall.dcinside.com/mgallery/board/view/?id={gallname}&no=") ||
+                    request.Url.StartsWith($"https://gall.dcinside.com/m/{gallname}/"))
+                {
+                    var no = request.Url.Split(new[] { '=', '/' }).Last();
+                    (new ArchiveViewer(no)).Show();
+                    return true;
+                }
+                return false;
+            }
+
+            protected override bool OnOpenUrlFromTab(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, string targetUrl, WindowOpenDisposition targetDisposition, bool userGesture)
+            { // https://gall.dcinside.com/m/{gallname}/
+                if (targetUrl.StartsWith($"https://gall.dcinside.com/mgallery/board/view?id={gallname}&no=") || 
+                    targetUrl.StartsWith($"https://gall.dcinside.com/mgallery/board/view/?id={gallname}&no=") ||
+                    targetUrl.StartsWith($"https://gall.dcinside.com/m/{gallname}/"))
+                {
+                    var no = targetUrl.Split(new[] { '=', '/' }).Last();
+                    (new ArchiveViewer(no)).Show();
+                }
+                else
+                {
+                    Process.Start(targetUrl);
+                }
+                return true;
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            const string resourcename = "http://mypage.html";
-            //html = html.Replace("dcimg2.dcinside", "dcimg6.dcinside");
-            System.IO.MemoryStream memorystream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(html));
-            browser.RegisterResourceHandler(resourcename, memorystream);
-            browser.LoadHtml(html, resourcename);
-            browser.UnRegisterResourceHandler(resourcename);
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
             if (comment_viewer != null)
                 comment_viewer.Close();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var links = article.datalinks.Split('|').Where(x => x != "").ToList();
+            var files = article.filenames.Split('|').Where(x => x != "").ToList();
+
+            var tasks = new List<NetTask>();
+            Directory.CreateDirectory("Images");
+            for (int i = 0; i < links.Count; i++) {
+                var task = MainWindow.Queue.MakeDefault(links[i]);
+                task.Filename = $"Images/[{article.no}] " + i.ToString().PadLeft(3, '0') + "." + files[i].Split('.').Last();
+                task.Referer = "https://gall.dcinside.com/mgallery/board/view?id=aoegame";
+                MainWindow.Queue.DownloadFileAsync(task);
+            }
         }
     }
 }

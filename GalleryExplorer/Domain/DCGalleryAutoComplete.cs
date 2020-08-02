@@ -21,6 +21,7 @@ namespace GalleryExplorer.Domain
         {
             this.filename = filename;
             Model = MessagePackSerializer.Deserialize<DCInsideGalleryModel>(File.ReadAllBytes(filename));
+            Model.articles.Sort((x, y) => Convert.ToInt32(y.no).CompareTo(Convert.ToInt32(x.no)));
         }
 
         public void Save()
@@ -106,6 +107,7 @@ namespace GalleryExplorer.Domain
                     "ip:",
                     "id:",
                     "class:",
+                    "no:",
                 };
 
             string w = word;
@@ -124,5 +126,6 @@ namespace GalleryExplorer.Domain
         public List<string> Id;
         public List<string> Ip;
         public List<string> Type;
+        public string no;
     }
 }
